@@ -1,0 +1,351 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2ADA1280B8C54C57B35100BE /* ReminderListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2879A53BAC984671BCFCA286 /* ReminderListView.swift */; };
+		33623FF5B8E846EBBFAC8783 /* HijriCalendarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E15A8173DD4501BA67F5DF /* HijriCalendarApp.swift */; };
+		B4D7E3F2C8A64D1EA71A9C3B /* ManualMoonsightingOverride.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C2F9E5B3F94452B1C3D5A7 /* ManualMoonsightingOverride.swift */; };
+		D2E4F6A8B1C24D3E9F0A1B2C /* MoonsightingAdjustmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A1D7F2E3B44C6A9D1E3F5B /* MoonsightingAdjustmentsView.swift */; };
+		6116769D66284EE6905FBD82 /* HijriCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3113C4CA7248E0BB3B6BB9 /* HijriCalendarView.swift */; };
+		7AE46478E27249B79F646624 /* HijriDateDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F972BE37A6FF4822B3EF0B7F /* HijriDateDisplay.swift */; };
+		8A7C794A481749688333B0F1 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB981DA991044AB8F06558F /* AppState.swift */; };
+		92D2790C434241D5AC458B25 /* HijriCalendarCore in Frameworks */ = {isa = PBXBuildFile; productRef = 40CD9921A89A42A494379B9B /* HijriCalendarCore */; };
+		9713A2743FAE4E53B1DC9CAC /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E18AF85DE0149E6A1D60AAF /* SampleData.swift */; };
+		EC673CB8EF9E4BDA8BF01F8D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBB15E9015E46B3B4E67758 /* SettingsView.swift */; };
+		FE0A49EE71DE4C3DB1F4F16A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925868D76D6B49769A7AAB40 /* ContentView.swift */; };
+		4275AA1DEED9404EB670139E /* ReminderEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907ACAFB849942689D8BD792 /* ReminderEditorView.swift */; };
+		25C10CC4992B4BF4898BC3AF /* ReminderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868B8CF53800474C8BA15873 /* ReminderDetailView.swift */; };
+		2468FD41A4954DB89AE859DB /* AttachmentStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C5AA44323B4F1AB1FA8DA6 /* AttachmentStorage.swift */; };
+		3400E3927FC34029814D48F3 /* LinkAttachmentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA5EDC300346A9A7953C25 /* LinkAttachmentEditorView.swift */; };
+		5D1EAE7C9C7A4C1E9D6632D4 /* PhotoGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A23FD481B34A5F9E3E8E26 /* PhotoGalleryView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0BBB15E9015E46B3B4E67758 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		2879A53BAC984671BCFCA286 /* ReminderListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderListView.swift; sourceTree = "<group>"; };
+		2E18AF85DE0149E6A1D60AAF /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		A1C2F9E5B3F94452B1C3D5A7 /* ManualMoonsightingOverride.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualMoonsightingOverride.swift; sourceTree = "<group>"; };
+		C8A1D7F2E3B44C6A9D1E3F5B /* MoonsightingAdjustmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonsightingAdjustmentsView.swift; sourceTree = "<group>"; };
+		925868D76D6B49769A7AAB40 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		96BF5F5B4F0D4EEDAF122E2E /* HijriCalendarApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = HijriCalendarApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE3113C4CA7248E0BB3B6BB9 /* HijriCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HijriCalendarView.swift; sourceTree = "<group>"; };
+		CFB981DA991044AB8F06558F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		D2E15A8173DD4501BA67F5DF /* HijriCalendarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HijriCalendarApp.swift; sourceTree = "<group>"; };
+		F972BE37A6FF4822B3EF0B7F /* HijriDateDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HijriDateDisplay.swift; sourceTree = "<group>"; };
+		907ACAFB849942689D8BD792 /* ReminderEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderEditorView.swift; sourceTree = "<group>"; };
+		868B8CF53800474C8BA15873 /* ReminderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderDetailView.swift; sourceTree = "<group>"; };
+		66C5AA44323B4F1AB1FA8DA6 /* AttachmentStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentStorage.swift; sourceTree = "<group>"; };
+		8EFA5EDC300346A9A7953C25 /* LinkAttachmentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkAttachmentEditorView.swift; sourceTree = "<group>"; };
+		B1A23FD481B34A5F9E3E8E26 /* PhotoGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGalleryView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		ED653B68A62E49BA83B99F71 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92D2790C434241D5AC458B25 /* HijriCalendarCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		18A166FC249E4C2683C285FE = {
+			isa = PBXGroup;
+			children = (
+				791EBB0725A54195A721602F /* . */,
+				B9D41E74ADBC4A8BB66746A2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		2E30CC6730464E57A235876D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CFB981DA991044AB8F06558F /* AppState.swift */,
+				2E18AF85DE0149E6A1D60AAF /* SampleData.swift */,
+				A1C2F9E5B3F94452B1C3D5A7 /* ManualMoonsightingOverride.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5862B3C278BD40A98EA42F9A /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F972BE37A6FF4822B3EF0B7F /* HijriDateDisplay.swift */,
+				66C5AA44323B4F1AB1FA8DA6 /* AttachmentStorage.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		791EBB0725A54195A721602F /* . */ = {
+			isa = PBXGroup;
+			children = (
+				D2E15A8173DD4501BA67F5DF /* HijriCalendarApp.swift */,
+				2E30CC6730464E57A235876D /* Models */,
+				CA9C682103F94E45971DAF1B /* Views */,
+				5862B3C278BD40A98EA42F9A /* Utilities */,
+			);
+			path = .;
+			sourceTree = "<group>";
+		};
+		B9D41E74ADBC4A8BB66746A2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				96BF5F5B4F0D4EEDAF122E2E /* HijriCalendarApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CA9C682103F94E45971DAF1B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				925868D76D6B49769A7AAB40 /* ContentView.swift */,
+				2879A53BAC984671BCFCA286 /* ReminderListView.swift */,
+				CE3113C4CA7248E0BB3B6BB9 /* HijriCalendarView.swift */,
+				0BBB15E9015E46B3B4E67758 /* SettingsView.swift */,
+				C8A1D7F2E3B44C6A9D1E3F5B /* MoonsightingAdjustmentsView.swift */,
+				907ACAFB849942689D8BD792 /* ReminderEditorView.swift */,
+				868B8CF53800474C8BA15873 /* ReminderDetailView.swift */,
+				8EFA5EDC300346A9A7953C25 /* LinkAttachmentEditorView.swift */,
+				B1A23FD481B34A5F9E3E8E26 /* PhotoGalleryView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BB201D14CA514E9BBA775815 /* HijriCalendarApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E7C3BF52D6D14C709F0D34EA /* Build configuration list for PBXNativeTarget "HijriCalendarApp" */;
+			buildPhases = (
+				9C9073A977FE4B76B3D9D947 /* Sources */,
+				ED653B68A62E49BA83B99F71 /* Frameworks */,
+				AB02EF160F974C409AD3231B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HijriCalendarApp;
+			packageProductDependencies = (
+				40CD9921A89A42A494379B9B /* HijriCalendarCore */,
+			);
+			productName = HijriCalendarApp;
+			productReference = 96BF5F5B4F0D4EEDAF122E2E /* HijriCalendarApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		341D8486DB5945B388848C16 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					BB201D14CA514E9BBA775815 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = AD15569371474D70BE23BF58 /* Build configuration list for PBXProject "HijriCalendarApp" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 18A166FC249E4C2683C285FE;
+			packageReferences = (
+				3E95AB253D59455E8012BEDB /* XCLocalSwiftPackageReference "../.." */,
+			);
+			productRefGroup = B9D41E74ADBC4A8BB66746A2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BB201D14CA514E9BBA775815 /* HijriCalendarApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AB02EF160F974C409AD3231B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9C9073A977FE4B76B3D9D947 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33623FF5B8E846EBBFAC8783 /* HijriCalendarApp.swift in Sources */,
+				8A7C794A481749688333B0F1 /* AppState.swift in Sources */,
+				9713A2743FAE4E53B1DC9CAC /* SampleData.swift in Sources */,
+				B4D7E3F2C8A64D1EA71A9C3B /* ManualMoonsightingOverride.swift in Sources */,
+				7AE46478E27249B79F646624 /* HijriDateDisplay.swift in Sources */,
+				FE0A49EE71DE4C3DB1F4F16A /* ContentView.swift in Sources */,
+				2ADA1280B8C54C57B35100BE /* ReminderListView.swift in Sources */,
+				6116769D66284EE6905FBD82 /* HijriCalendarView.swift in Sources */,
+				EC673CB8EF9E4BDA8BF01F8D /* SettingsView.swift in Sources */,
+				D2E4F6A8B1C24D3E9F0A1B2C /* MoonsightingAdjustmentsView.swift in Sources */,
+				4275AA1DEED9404EB670139E /* ReminderEditorView.swift in Sources */,
+				25C10CC4992B4BF4898BC3AF /* ReminderDetailView.swift in Sources */,
+				2468FD41A4954DB89AE859DB /* AttachmentStorage.swift in Sources */,
+				3400E3927FC34029814D48F3 /* LinkAttachmentEditorView.swift in Sources */,
+				5D1EAE7C9C7A4C1E9D6632D4 /* PhotoGalleryView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		771A1641BB4E4A978560B56D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNDOCUMENTED_OBJC_DESIGNATED_INITIALIZER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+			};
+			name = Release;
+		};
+		9C35FA26869346A3A6D418AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 468TUNCHLH;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Hijri Calendar";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mmahmad.hijricalendar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9EF864102D124350B06C4B58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNDOCUMENTED_OBJC_DESIGNATED_INITIALIZER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+			};
+			name = Debug;
+		};
+		BC458C2B67144A2D8E2053B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 468TUNCHLH;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Hijri Calendar";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mmahmad.hijricalendar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AD15569371474D70BE23BF58 /* Build configuration list for PBXProject "HijriCalendarApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9EF864102D124350B06C4B58 /* Debug */,
+				771A1641BB4E4A978560B56D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E7C3BF52D6D14C709F0D34EA /* Build configuration list for PBXNativeTarget "HijriCalendarApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C35FA26869346A3A6D418AC /* Debug */,
+				BC458C2B67144A2D8E2053B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		3E95AB253D59455E8012BEDB /* XCLocalSwiftPackageReference "../.." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		40CD9921A89A42A494379B9B /* HijriCalendarCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3E95AB253D59455E8012BEDB /* XCLocalSwiftPackageReference "../.." */;
+			productName = HijriCalendarCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 341D8486DB5945B388848C16 /* Project object */;
+}
