@@ -42,6 +42,29 @@ struct SettingsView: View {
                 }
             }
 
+            Section("Authority") {
+                Toggle("Follow authority updates (CHC)", isOn: $appState.authorityEnabled)
+                TextField("Authority feed URL", text: $appState.authorityFeedURLString)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+
+                Text("Manual overrides always take precedence over authority updates.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                if let authority = appState.authorityInfo {
+                    Text("Authority: \(authority.name)")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
+                if let error = appState.authorityError {
+                    Text(error)
+                        .font(.footnote)
+                        .foregroundStyle(.red)
+                }
+            }
+
             Section("Backup") {
                 Button("Export backup") {
                 }

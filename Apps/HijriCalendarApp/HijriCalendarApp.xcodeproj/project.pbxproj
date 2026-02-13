@@ -10,6 +10,7 @@
 		2ADA1280B8C54C57B35100BE /* ReminderListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2879A53BAC984671BCFCA286 /* ReminderListView.swift */; };
 		33623FF5B8E846EBBFAC8783 /* HijriCalendarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E15A8173DD4501BA67F5DF /* HijriCalendarApp.swift */; };
 		B4D7E3F2C8A64D1EA71A9C3B /* ManualMoonsightingOverride.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C2F9E5B3F94452B1C3D5A7 /* ManualMoonsightingOverride.swift */; };
+		A4B8D9E17F2C4AB89F0E1234 /* ReminderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F1E2D4A5B64C7D8E9F0123 /* ReminderStore.swift */; };
 		D2E4F6A8B1C24D3E9F0A1B2C /* MoonsightingAdjustmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A1D7F2E3B44C6A9D1E3F5B /* MoonsightingAdjustmentsView.swift */; };
 		6116769D66284EE6905FBD82 /* HijriCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3113C4CA7248E0BB3B6BB9 /* HijriCalendarView.swift */; };
 		7AE46478E27249B79F646624 /* HijriDateDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F972BE37A6FF4822B3EF0B7F /* HijriDateDisplay.swift */; };
@@ -30,6 +31,7 @@
 		2879A53BAC984671BCFCA286 /* ReminderListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderListView.swift; sourceTree = "<group>"; };
 		2E18AF85DE0149E6A1D60AAF /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
 		A1C2F9E5B3F94452B1C3D5A7 /* ManualMoonsightingOverride.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualMoonsightingOverride.swift; sourceTree = "<group>"; };
+		C3F1E2D4A5B64C7D8E9F0123 /* ReminderStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderStore.swift; sourceTree = "<group>"; };
 		C8A1D7F2E3B44C6A9D1E3F5B /* MoonsightingAdjustmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonsightingAdjustmentsView.swift; sourceTree = "<group>"; };
 		925868D76D6B49769A7AAB40 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		96BF5F5B4F0D4EEDAF122E2E /* HijriCalendarApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = HijriCalendarApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				CFB981DA991044AB8F06558F /* AppState.swift */,
+				C3F1E2D4A5B64C7D8E9F0123 /* ReminderStore.swift */,
 				2E18AF85DE0149E6A1D60AAF /* SampleData.swift */,
 				A1C2F9E5B3F94452B1C3D5A7 /* ManualMoonsightingOverride.swift */,
 			);
@@ -192,6 +195,7 @@
 			files = (
 				33623FF5B8E846EBBFAC8783 /* HijriCalendarApp.swift in Sources */,
 				8A7C794A481749688333B0F1 /* AppState.swift in Sources */,
+				A4B8D9E17F2C4AB89F0E1234 /* ReminderStore.swift in Sources */,
 				9713A2743FAE4E53B1DC9CAC /* SampleData.swift in Sources */,
 				B4D7E3F2C8A64D1EA71A9C3B /* ManualMoonsightingOverride.swift in Sources */,
 				7AE46478E27249B79F646624 /* HijriDateDisplay.swift in Sources */,

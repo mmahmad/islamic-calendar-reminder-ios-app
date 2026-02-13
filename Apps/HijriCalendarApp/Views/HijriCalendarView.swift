@@ -256,12 +256,26 @@ struct HijriCalendarView: View {
             return "Moonsighting"
         case .manual:
             return "Manual (user)"
+        case .authority:
+            return "Authority (\(appState.authorityDisplayName))"
         case .calculated:
-            return appState.manualMoonsightingEnabled ? "Calculated (manual pending)" : "Calculated"
+            if appState.manualMoonsightingEnabled {
+                return "Calculated (manual pending)"
+            }
+            if appState.authorityEnabled {
+                return "Calculated (authority pending)"
+            }
+            return "Calculated"
         }
     }
 
     private var attributionText: String {
+        if appState.authorityEnabled && appState.manualMoonsightingEnabled {
+            return "Calculated dates: Fiqh Council (fiqhcouncil.org/calendar). Authority: \(appState.authorityDisplayName). Manual overrides enabled."
+        }
+        if appState.authorityEnabled {
+            return "Calculated dates: Fiqh Council (fiqhcouncil.org/calendar). Authority: \(appState.authorityDisplayName)."
+        }
         if appState.manualMoonsightingEnabled {
             return "Calculated dates: Fiqh Council (fiqhcouncil.org/calendar). Manual moonsighting updates are user-provided."
         }

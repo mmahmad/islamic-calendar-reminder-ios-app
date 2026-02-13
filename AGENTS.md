@@ -1,27 +1,22 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository currently contains documentation only; source code has not been added yet. As you add code, keep a predictable layout and document it here. A common pattern is:
+Current layout:
 
-- `src/` for application code
-- `tests/` or `__tests__/` for automated tests
-- `assets/` or `public/` for static files
-- `scripts/` for dev utilities
-- `docs/` for specs and design notes
-- `Apps/` for iOS app sources (SwiftUI shell and views)
-- `REQUIREMENTS.md` for the product requirements baseline
-- `docs/ENGINEERING_SPEC.md` for the technical spec
-
-If you choose a different structure, update this section with the actual paths and a short description of each top-level directory.
+- `Apps/HijriCalendarApp/` — SwiftUI iOS app.
+- `Sources/HijriCalendarCore/` — shared calendar logic and parsers.
+- `Tests/` — core module tests and fixtures.
+- `platform/` — Convex-backed authority console (web UI + API).
+- `docs/` — specs and design notes.
+- `REQUIREMENTS.md` — product requirements baseline.
+- `AGENTS.md` — contributor and automation guidelines.
 
 ## Build, Test, and Development Commands
-No build, test, or dev commands are defined yet. When you add tooling, list the exact commands and what they do. Example format:
+Common commands:
 
-- `npm run dev` — start the local dev server
-- `npm test` — run the test suite
-- `npm run build` — create a production build
-
-Replace the examples with the real commands for this project.
+- `xcodebuild -project Apps/HijriCalendarApp/HijriCalendarApp.xcodeproj -scheme HijriCalendarApp -configuration Debug -destination 'id=<DEVICE_ID>' install` — build and install to a device.
+- `cd platform && npm run dev` — start the authority console.
+- `cd platform && npx convex dev` — run Convex backend locally.
 
 ## Coding Style & Naming Conventions
 No style guide is enforced yet. Once you choose a formatter/linter, document it here (for example, Prettier/ESLint or Black/ruff). Until then:

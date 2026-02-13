@@ -4,6 +4,7 @@ public enum CalendarSource: String, Codable {
     case calculated
     case moonsighting
     case manual
+    case authority
 }
 
 public struct HijriMonthDefinition: Hashable, Codable {

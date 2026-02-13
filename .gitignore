@@ -6,3 +6,14 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+platform/node_modules/
+platform/dist/
+platform/.env
+platform/.env.local
+platform/.env.*.local
+platform/convex/.env
+platform/convex/.env.local
+platform/convex/_generated/
+platform/convex/*.js
+platform/convex/*.js.map
+platform/convex/out/

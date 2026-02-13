@@ -3,7 +3,29 @@ import HijriCalendarCore
 
 @MainActor
 final class AppState: ObservableObject {
-    @Published var reminders: [HijriReminder] = SampleData.reminders
+    @Published var reminders: [HijriReminder] = [] {
+        didSet {
+            reminderStore.save(reminders)
+        }
+    }
+    @Published var authorityEnabled: Bool {
+        didSet {
+            guard oldValue != authorityEnabled else { return }
+            UserDefaults.standard.set(authorityEnabled, forKey: Self.authorityEnabledKey)
+            Task {
+                await refreshCalendarData(force: true)
+            }
+        }
+    }
+    @Published var authorityFeedURLString: String {
+        didSet {
+            guard oldValue != authorityFeedURLString else { return }
+            UserDefaults.standard.set(authorityFeedURLString, forKey: Self.authorityFeedURLKey)
+            Task {
+                await refreshCalendarData(force: true)
+            }
+        }
+    }
     @Published var manualMoonsightingEnabled: Bool {
         didSet {
             guard oldValue != manualMoonsightingEnabled else { return }
@@ -22,15 +44,26 @@ final class AppState: ObservableObject {
             ManualMoonsightingStore.save(manualOverrides)
         }
     }
+    @Published var authorityInfo: AuthorityCalendarProvider.AuthorityInfo?
+    @Published var authorityError: String?
     @Published var calendarError: String?
     @Published var calendarUpdateMessage: String?
     @Published var isRefreshingCalendar = false
 
+    private let reminderStore: any ReminderStoring
     private let calculatedProvider = CalculatedCalendarProvider()
+    private let authorityName = "Central Hilal Committee"
     private var refreshLoopTask: Task<Void, Never>?
+    private static let authorityEnabledKey = "authorityEnabled"
+    private static let authorityFeedURLKey = "authorityFeedURL"
     private static let manualMoonsightingKey = "manualMoonsightingEnabled"
+    private static let defaultAuthorityFeedURL = ""
 
-    init() {
+    init(reminderStore: any ReminderStoring = JSONReminderStore()) {
+        self.reminderStore = reminderStore
+        self.reminders = reminderStore.load()
+        self.authorityEnabled = UserDefaults.standard.bool(forKey: Self.authorityEnabledKey)
+        self.authorityFeedURLString = UserDefaults.standard.string(forKey: Self.authorityFeedURLKey) ?? Self.defaultAuthorityFeedURL
         self.manualMoonsightingEnabled = UserDefaults.standard.bool(forKey: Self.manualMoonsightingKey)
         self.manualOverrides = ManualMoonsightingStore.load()
     }
@@ -38,6 +71,14 @@ final class AppState: ObservableObject {
     var calendarEngine: CalendarEngine? {
         guard !calendarDefinitions.isEmpty else { return nil }
         return CalendarEngine(definitions: calendarDefinitions, calendar: Calendar.current)
+    }
+
+    var authorityFeedURL: URL? {
+        URL(string: authorityFeedURLString)
+    }
+
+    var authorityDisplayName: String {
+        authorityInfo?.name ?? authorityName
     }
 
     func refreshCalendarData(force: Bool = false) async {
@@ -48,13 +89,44 @@ final class AppState: ObservableObject {
 
         isRefreshingCalendar = true
         calendarError = nil
+        authorityError = nil
+        authorityInfo = nil
         defer { isRefreshingCalendar = false }
 
         do {
             let calculated = try await calculatedProvider.fetchMonthDefinitions()
             calculatedDefinitions = calculated
             let previous = calendarDefinitions
-            let merged = manualMoonsightingEnabled ? applyManualOverrides(to: calculated) : calculated
+            var merged = calculated
+
+            if authorityEnabled {
+                if let feedURL = authorityFeedURL {
+                    do {
+                        let provider = AuthorityCalendarProvider(feedURL: feedURL)
+                        let (info, overrides) = try await provider.fetchAuthorityOverrides()
+                        authorityInfo = info
+                        merged = applyOverrides(
+                            to: merged,
+                            overrides: overrides.map { MonthStartOverride(year: $0.hijriYear, month: $0.hijriMonth, date: $0.gregorianStartDate) },
+                            overrideSource: .authority
+                        )
+                    } catch {
+                        authorityError = "Authority feed is unavailable right now."
+                    }
+                } else {
+                    authorityError = "Authority feed URL is missing."
+                }
+            }
+
+            if manualMoonsightingEnabled {
+                merged = applyOverrides(
+                    to: merged,
+                    overrides: activeManualOverrides()
+                        .values
+                        .map { MonthStartOverride(year: $0.hijriYear, month: $0.hijriMonth, date: $0.gregorianStartDate) },
+                    overrideSource: .manual
+                )
+            }
 
             calendarDefinitions = merged.sorted { $0.gregorianStartDate < $1.gregorianStartDate }
             lastRefresh = now
@@ -133,20 +205,24 @@ final class AppState: ObservableObject {
         return previousDefinition.source == .manual
     }
 
-    private func applyManualOverrides(to calculated: [HijriMonthDefinition]) -> [HijriMonthDefinition] {
-        let calculatedMap = Dictionary(uniqueKeysWithValues: calculated.map { (HijriMonthKey($0), $0) })
-        let overrides = activeManualOverrides()
+    private func applyOverrides(
+        to base: [HijriMonthDefinition],
+        overrides: [MonthStartOverride],
+        overrideSource: CalendarSource
+    ) -> [HijriMonthDefinition] {
+        let baseMap = Dictionary(uniqueKeysWithValues: base.map { (HijriMonthKey($0), $0) })
+        let overrideMap = Dictionary(uniqueKeysWithValues: overrides.map { (HijriMonthKey(year: $0.year, month: $0.month), $0) })
 
         var merged: [HijriMonthKey: HijriMonthDefinition] = [:]
-        for definition in calculated {
+        for definition in base {
             let key = HijriMonthKey(definition)
-            if let override = overrides[key] {
+            if let override = overrideMap[key] {
                 merged[key] = HijriMonthDefinition(
-                    hijriYear: override.hijriYear,
-                    hijriMonth: override.hijriMonth,
-                    gregorianStartDate: override.gregorianStartDate,
+                    hijriYear: override.year,
+                    hijriMonth: override.month,
+                    gregorianStartDate: override.date,
                     length: definition.length,
-                    source: .manual
+                    source: overrideSource
                 )
             } else {
                 merged[key] = definition
@@ -162,7 +238,7 @@ final class AppState: ObservableObject {
         for key in keys {
             guard let current = merged[key] else { continue }
             let nextKey = key.nextMonth()
-            let fallbackLength = calculatedMap[key]?.length ?? current.length
+            let fallbackLength = baseMap[key]?.length ?? current.length
             var resolvedLength = fallbackLength
             var resolvedSource = current.source
             if let next = nextKey.flatMap({ merged[$0] }) {
@@ -174,8 +250,9 @@ final class AppState: ObservableObject {
 
                 if (29...30).contains(diff) {
                     resolvedLength = diff
-                    if resolvedSource != .manual && next.source == .manual {
-                        resolvedSource = .manual
+                    let nextKey = HijriMonthKey(year: next.hijriYear, month: next.hijriMonth)
+                    if resolvedSource != .manual, overrideMap[nextKey] != nil {
+                        resolvedSource = overrideSource
                     }
                 }
             }
@@ -219,6 +296,12 @@ final class AppState: ObservableObject {
         }
         return "Calendar updated for \(labels.joined(separator: ", "))."
     }
+}
+
+private struct MonthStartOverride {
+    let year: Int
+    let month: Int
+    let date: Date
 }
 
 private struct HijriMonthKey: Hashable {
