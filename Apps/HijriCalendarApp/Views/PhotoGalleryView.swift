@@ -229,6 +229,7 @@ private struct PhotoFullView: View {
 private enum AttachmentImageLoader {
     static func uiImage(for attachment: Attachment) -> UIImage? {
         guard let path = attachment.path else { return nil }
-        return UIImage(contentsOfFile: path)
+        let absolutePath = AttachmentStorage.absoluteURL(forStoredPath: path).path
+        return UIImage(contentsOfFile: absolutePath)
     }
 }

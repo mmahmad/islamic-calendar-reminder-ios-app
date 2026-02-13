@@ -388,19 +388,26 @@ private struct DayRemindersSheet: View {
                 }
 
                 Section("Reminders") {
-                    if matchingReminders.isEmpty {
+                    if matchingReminderIDs.isEmpty {
                         Text("No reminders for this date.")
                             .foregroundStyle(.secondary)
                     } else {
-                        ForEach(matchingReminders) { reminder in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(reminder.title)
-                                    .font(.body)
-                                Text(timeAndRecurrenceLabel(for: reminder))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                        ForEach(matchingReminderIDs, id: \.self) { reminderID in
+                            if let reminder = reminder(with: reminderID),
+                               let reminderBinding = reminderBinding(for: reminderID) {
+                                NavigationLink {
+                                    ReminderDetailView(reminder: reminderBinding)
+                                } label: {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(reminder.title)
+                                            .font(.body)
+                                        Text(timeAndRecurrenceLabel(for: reminder))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .padding(.vertical, 2)
+                                }
                             }
-                            .padding(.vertical, 2)
                         }
                     }
                 }
@@ -429,7 +436,7 @@ private struct DayRemindersSheet: View {
         }
     }
 
-    private var matchingReminders: [HijriReminder] {
+    private var matchingReminderIDs: [UUID] {
         appState.reminders
             .filter(occursOnSelectedDay)
             .sorted { lhs, rhs in
@@ -438,6 +445,7 @@ private struct DayRemindersSheet: View {
                 }
                 return lhs.time.hour < rhs.time.hour
             }
+            .map(\.id)
     }
 
     private var gregorianDateLabel: String {
@@ -458,6 +466,17 @@ private struct DayRemindersSheet: View {
         }
         let interval = DateInterval(start: selection.gregorianDate, end: dayEnd)
         return !engine.occurrenceDates(for: reminder, within: interval).isEmpty
+    }
+
+    private func reminder(with id: UUID) -> HijriReminder? {
+        appState.reminders.first(where: { $0.id == id })
+    }
+
+    private func reminderBinding(for id: UUID) -> Binding<HijriReminder>? {
+        guard let index = appState.reminders.firstIndex(where: { $0.id == id }) else {
+            return nil
+        }
+        return $appState.reminders[index]
     }
 
     private func timeAndRecurrenceLabel(for reminder: HijriReminder) -> String {

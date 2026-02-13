@@ -2,16 +2,19 @@ import Foundation
 import HijriCalendarCore
 
 enum AttachmentStorage {
+    private static let attachmentsDirectoryName = "Attachments"
+
     static func savePhotoData(_ data: Data) -> Attachment? {
         let directory = attachmentsDirectory()
         let filename = "photo-\(UUID().uuidString).dat"
         let url = directory.appendingPathComponent(filename)
+        let relativePath = storedPath(forFilename: filename)
 
         do {
             try data.write(to: url, options: [.atomic])
             return Attachment(
                 type: .photo,
-                path: url.path,
+                path: relativePath,
                 displayName: "Photo"
             )
         } catch {
@@ -31,6 +34,7 @@ enum AttachmentStorage {
         let filename = url.lastPathComponent
         let targetName = "\(UUID().uuidString)-\(filename)"
         let targetURL = directory.appendingPathComponent(targetName)
+        let relativePath = storedPath(forFilename: targetName)
 
         do {
             if FileManager.default.fileExists(atPath: targetURL.path) {
@@ -39,7 +43,7 @@ enum AttachmentStorage {
             try FileManager.default.copyItem(at: url, to: targetURL)
             return Attachment(
                 type: .file,
-                path: targetURL.path,
+                path: relativePath,
                 displayName: filename
             )
         } catch {
@@ -47,15 +51,26 @@ enum AttachmentStorage {
         }
     }
 
+    static func absoluteURL(forStoredPath storedPath: String) -> URL {
+        documentsDirectory().appendingPathComponent(storedPath)
+    }
+
     private static func attachmentsDirectory() -> URL {
-        let base = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-            ?? URL(fileURLWithPath: NSTemporaryDirectory())
-        let directory = base.appendingPathComponent("Attachments", isDirectory: true)
+        let directory = documentsDirectory().appendingPathComponent(attachmentsDirectoryName, isDirectory: true)
 
         if !FileManager.default.fileExists(atPath: directory.path) {
             try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         }
 
         return directory
+    }
+
+    private static func storedPath(forFilename filename: String) -> String {
+        "\(attachmentsDirectoryName)/\(filename)"
+    }
+
+    private static func documentsDirectory() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSTemporaryDirectory())
     }
 }
