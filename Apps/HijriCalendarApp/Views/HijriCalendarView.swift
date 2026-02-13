@@ -79,6 +79,7 @@ struct HijriCalendarView: View {
 
     private func calendarContent(for definition: HijriMonthDefinition) -> some View {
         let cells = monthCells(for: definition)
+        let reminderDays = reminderDays(in: definition)
         return ScrollView {
             VStack(spacing: 16) {
                 calendarHeader(for: definition)
@@ -99,7 +100,8 @@ struct HijriCalendarView: View {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 7), spacing: 8) {
                     ForEach(cells.indices, id: \.self) { index in
                         if let cell = cells[index] {
-                            calendarDayCell(cell, in: definition)
+                            let day = calendar.startOfDay(for: cell.gregorianDate)
+                            calendarDayCell(cell, in: definition, hasReminder: reminderDays.contains(day))
                         } else {
                             Color.clear
                                 .frame(height: 52)
@@ -158,7 +160,11 @@ struct HijriCalendarView: View {
         }
     }
 
-    private func calendarDayCell(_ cell: HijriCalendarCell, in definition: HijriMonthDefinition) -> some View {
+    private func calendarDayCell(
+        _ cell: HijriCalendarCell,
+        in definition: HijriMonthDefinition,
+        hasReminder: Bool
+    ) -> some View {
         let gregorianDay = calendar.component(.day, from: cell.gregorianDate)
         return VStack(spacing: 4) {
             Text("\(cell.hijriDay)")
@@ -167,6 +173,10 @@ struct HijriCalendarView: View {
             Text("\(gregorianDay)")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            Circle()
+                .fill(hasReminder ? Color.red : Color.clear)
+                .frame(width: 6, height: 6)
+                .accessibilityHidden(true)
         }
         .frame(maxWidth: .infinity, minHeight: 52)
         .padding(6)
@@ -223,6 +233,32 @@ struct HijriCalendarView: View {
             cells.append(HijriCalendarCell(hijriDay: day, gregorianDate: date, isToday: isToday))
         }
         return cells
+    }
+
+    private func reminderDays(in definition: HijriMonthDefinition) -> Set<Date> {
+        guard let engine = appState.calendarEngine else { return [] }
+
+        let monthStart = calendar.startOfDay(for: definition.gregorianStartDate)
+        guard let monthEndExclusive = calendar.date(byAdding: .day, value: definition.length, to: monthStart) else {
+            return []
+        }
+
+        let maxDuration = max(appState.reminders.map(\.durationDays).max() ?? 1, 1)
+        let lookbackDays = maxDuration - 1
+        let queryStart = calendar.date(byAdding: .day, value: -lookbackDays, to: monthStart) ?? monthStart
+        let queryInterval = DateInterval(start: queryStart, end: monthEndExclusive)
+
+        var days = Set<Date>()
+        for reminder in appState.reminders {
+            let occurrences = engine.occurrenceDates(for: reminder, within: queryInterval)
+            for occurrence in occurrences {
+                let day = calendar.startOfDay(for: occurrence)
+                if day >= monthStart && day < monthEndExclusive {
+                    days.insert(day)
+                }
+            }
+        }
+        return days
     }
 
     private func gregorianRangeLabel(for definition: HijriMonthDefinition) -> String {
