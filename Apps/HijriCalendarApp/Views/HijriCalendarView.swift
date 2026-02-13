@@ -6,7 +6,7 @@ struct HijriCalendarView: View {
     @State private var selectedIndex = 0
     @State private var selectedMonthKey: HijriMonthKey?
     @State private var hasInitializedSelection = false
-    @State private var pendingReminder: HijriReminder?
+    @State private var selectedDay: CalendarDaySelection?
 
     private let calendar = Calendar.current
 
@@ -36,10 +36,9 @@ struct HijriCalendarView: View {
         .onChange(of: appState.calendarDefinitions) { _ in
             syncSelectionIfNeeded()
         }
-        .sheet(item: $pendingReminder) { reminder in
-            ReminderEditorView(reminder: reminder) { newReminder in
-                appState.reminders.append(newReminder)
-            }
+        .sheet(item: $selectedDay) { day in
+            DayRemindersSheet(selection: day)
+                .environmentObject(appState)
         }
     }
 
@@ -184,7 +183,7 @@ struct HijriCalendarView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .contentShape(RoundedRectangle(cornerRadius: 10))
         .onTapGesture {
-            presentReminder(for: cell, month: definition.hijriMonth)
+            presentDayDetails(for: cell, in: definition)
         }
     }
 
@@ -348,15 +347,143 @@ struct HijriCalendarView: View {
         selectedMonthKey = HijriMonthKey(year: definition.hijriYear, month: definition.hijriMonth)
     }
 
-    private func presentReminder(for cell: HijriCalendarCell, month: Int) {
-        let reminder = HijriReminder(
+    private func presentDayDetails(for cell: HijriCalendarCell, in definition: HijriMonthDefinition) {
+        selectedDay = CalendarDaySelection(
+            gregorianDate: calendar.startOfDay(for: cell.gregorianDate),
+            hijriYear: definition.hijriYear,
+            hijriMonth: definition.hijriMonth,
+            hijriDay: cell.hijriDay
+        )
+    }
+}
+
+private struct CalendarDaySelection: Identifiable {
+    let id = UUID()
+    let gregorianDate: Date
+    let hijriYear: Int
+    let hijriMonth: Int
+    let hijriDay: Int
+}
+
+private struct DayRemindersSheet: View {
+    @EnvironmentObject private var appState: AppState
+    @Environment(\.dismiss) private var dismiss
+    @State private var pendingReminder: HijriReminder?
+
+    let selection: CalendarDaySelection
+
+    private let calendar = Calendar.current
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(gregorianDateLabel)
+                            .font(.headline)
+                        Text(hijriDateLabel)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Section("Reminders") {
+                    if matchingReminders.isEmpty {
+                        Text("No reminders for this date.")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(matchingReminders) { reminder in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(reminder.title)
+                                    .font(.body)
+                                Text(timeAndRecurrenceLabel(for: reminder))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 2)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Day")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        presentAddReminder()
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityLabel("Add Reminder")
+                }
+            }
+        }
+        .sheet(item: $pendingReminder) { reminder in
+            ReminderEditorView(reminder: reminder) { newReminder in
+                appState.reminders.append(newReminder)
+            }
+        }
+    }
+
+    private var matchingReminders: [HijriReminder] {
+        appState.reminders
+            .filter(occursOnSelectedDay)
+            .sorted { lhs, rhs in
+                if lhs.time.hour == rhs.time.hour {
+                    return lhs.time.minute < rhs.time.minute
+                }
+                return lhs.time.hour < rhs.time.hour
+            }
+    }
+
+    private var gregorianDateLabel: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        formatter.timeStyle = .none
+        return formatter.string(from: selection.gregorianDate)
+    }
+
+    private var hijriDateLabel: String {
+        "\(selection.hijriDay) \(HijriDateDisplay.monthName(for: selection.hijriMonth)) \(selection.hijriYear)"
+    }
+
+    private func occursOnSelectedDay(_ reminder: HijriReminder) -> Bool {
+        guard let engine = appState.calendarEngine else { return false }
+        guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: selection.gregorianDate) else {
+            return false
+        }
+        let interval = DateInterval(start: selection.gregorianDate, end: dayEnd)
+        return !engine.occurrenceDates(for: reminder, within: interval).isEmpty
+    }
+
+    private func timeAndRecurrenceLabel(for reminder: HijriReminder) -> String {
+        let now = Date()
+        let date = calendar.date(
+            bySettingHour: reminder.time.hour,
+            minute: reminder.time.minute,
+            second: 0,
+            of: now
+        ) ?? now
+
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+
+        let recurrenceLabel = reminder.recurrence == .annual ? "Annual" : "One-time"
+        return "\(formatter.string(from: date)) • \(recurrenceLabel)"
+    }
+
+    private func presentAddReminder() {
+        pendingReminder = HijriReminder(
             title: "",
-            hijriDate: HijriDate(month: month, day: cell.hijriDay),
+            hijriDate: HijriDate(month: selection.hijriMonth, day: selection.hijriDay),
             recurrence: .annual,
             time: ReminderTime(hour: 0, minute: 0),
             durationDays: 1
         )
-        pendingReminder = reminder
     }
 }
 
