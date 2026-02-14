@@ -15,6 +15,7 @@ Hijri-based reminders with a familiar Reminders-style UI. The app focuses on use
 - `Sources/HijriCalendarCore/` — shared calendar logic + parsers.
 - `platform/` — Convex-powered authority console (admin UI + API).
 - `docs/ENGINEERING_SPEC.md` — technical spec and diagrams.
+- `docs/AUTHORITY_PLATFORM_REPLAN.md` — backend re-plan for multi-authority subscriptions.
 - `REQUIREMENTS.md` — product requirements baseline.
 - `AGENTS.md` — contributor and automation guidelines.
 

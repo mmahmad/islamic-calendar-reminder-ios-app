@@ -13,14 +13,27 @@ final class AppState: ObservableObject {
             guard oldValue != authorityEnabled else { return }
             UserDefaults.standard.set(authorityEnabled, forKey: Self.authorityEnabledKey)
             Task {
+                if authorityEnabled {
+                    await refreshAuthorityDirectory(force: true)
+                }
                 await refreshCalendarData(force: true)
             }
         }
     }
-    @Published var authorityFeedURLString: String {
+    @Published var authorityBaseURLString: String {
         didSet {
-            guard oldValue != authorityFeedURLString else { return }
-            UserDefaults.standard.set(authorityFeedURLString, forKey: Self.authorityFeedURLKey)
+            guard oldValue != authorityBaseURLString else { return }
+            UserDefaults.standard.set(authorityBaseURLString, forKey: Self.authorityBaseURLKey)
+            Task {
+                await refreshAuthorityDirectory(force: true)
+                await refreshCalendarData(force: true)
+            }
+        }
+    }
+    @Published var selectedAuthoritySlug: String {
+        didSet {
+            guard oldValue != selectedAuthoritySlug else { return }
+            UserDefaults.standard.set(selectedAuthoritySlug, forKey: Self.selectedAuthoritySlugKey)
             Task {
                 await refreshCalendarData(force: true)
             }
@@ -45,25 +58,34 @@ final class AppState: ObservableObject {
         }
     }
     @Published var authorityInfo: AuthorityCalendarProvider.AuthorityInfo?
+    @Published var availableAuthorities: [AuthorityDirectoryEntry] = []
     @Published var authorityError: String?
     @Published var calendarError: String?
     @Published var calendarUpdateMessage: String?
     @Published var isRefreshingCalendar = false
+    @Published var isRefreshingAuthorities = false
 
     private let reminderStore: any ReminderStoring
     private let calculatedProvider = CalculatedCalendarProvider()
-    private let authorityName = "Central Hilal Committee"
     private var refreshLoopTask: Task<Void, Never>?
+    private var authorityDirectoryLastRefresh: Date?
     private static let authorityEnabledKey = "authorityEnabled"
-    private static let authorityFeedURLKey = "authorityFeedURL"
+    private static let authorityBaseURLKey = "authorityBaseURL"
+    private static let selectedAuthoritySlugKey = "selectedAuthoritySlug"
+    private static let legacyAuthorityFeedURLKey = "authorityFeedURL"
     private static let manualMoonsightingKey = "manualMoonsightingEnabled"
-    private static let defaultAuthorityFeedURL = ""
+    private static let defaultAuthorityBaseURL = ""
+    private static let defaultSelectedAuthoritySlug = ""
 
     init(reminderStore: any ReminderStoring = JSONReminderStore()) {
         self.reminderStore = reminderStore
         self.reminders = reminderStore.load()
         self.authorityEnabled = UserDefaults.standard.bool(forKey: Self.authorityEnabledKey)
-        self.authorityFeedURLString = UserDefaults.standard.string(forKey: Self.authorityFeedURLKey) ?? Self.defaultAuthorityFeedURL
+        let storedBaseURL = UserDefaults.standard.string(forKey: Self.authorityBaseURLKey) ?? Self.defaultAuthorityBaseURL
+        let storedSlug = UserDefaults.standard.string(forKey: Self.selectedAuthoritySlugKey) ?? Self.defaultSelectedAuthoritySlug
+        let migrated = Self.migratedAuthorityConfig(baseURL: storedBaseURL, slug: storedSlug)
+        self.authorityBaseURLString = migrated.baseURL
+        self.selectedAuthoritySlug = migrated.slug
         self.manualMoonsightingEnabled = UserDefaults.standard.bool(forKey: Self.manualMoonsightingKey)
         self.manualOverrides = ManualMoonsightingStore.load()
     }
@@ -73,12 +95,32 @@ final class AppState: ObservableObject {
         return CalendarEngine(definitions: calendarDefinitions, calendar: Calendar.current)
     }
 
+    var authorityBaseURL: URL? {
+        let trimmed = authorityBaseURLString.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        return URL(string: trimmed)
+    }
+
     var authorityFeedURL: URL? {
-        URL(string: authorityFeedURLString)
+        guard let baseURL = authorityBaseURL else { return nil }
+        let slug = selectedAuthoritySlug.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !slug.isEmpty else { return nil }
+        return baseURL
+            .appendingPathComponent("authority")
+            .appendingPathComponent(slug)
     }
 
     var authorityDisplayName: String {
-        authorityInfo?.name ?? authorityName
+        if let name = authorityInfo?.name {
+            return name
+        }
+        if let match = availableAuthorities.first(where: { $0.slug == selectedAuthoritySlug }) {
+            return match.name
+        }
+        if selectedAuthoritySlug.isEmpty {
+            return "Selected authority"
+        }
+        return selectedAuthoritySlug
     }
 
     func refreshCalendarData(force: Bool = false) async {
@@ -100,6 +142,7 @@ final class AppState: ObservableObject {
             var merged = calculated
 
             if authorityEnabled {
+                await refreshAuthorityDirectory(force: force)
                 if let feedURL = authorityFeedURL {
                     do {
                         let provider = AuthorityCalendarProvider(feedURL: feedURL)
@@ -113,8 +156,10 @@ final class AppState: ObservableObject {
                     } catch {
                         authorityError = "Authority feed is unavailable right now."
                     }
+                } else if authorityBaseURL == nil {
+                    authorityError = "Authority API base URL is missing."
                 } else {
-                    authorityError = "Authority feed URL is missing."
+                    authorityError = "Select an authority to follow."
                 }
             }
 
@@ -139,6 +184,50 @@ final class AppState: ObservableObject {
                 calendarError = "Unable to load the calculated calendar. \(description)"
             } else {
                 calendarError = "Unable to load the calculated calendar. \(error.localizedDescription)"
+            }
+        }
+    }
+
+    func refreshAuthorityDirectory(force: Bool = false) async {
+        let now = Date()
+        if !force,
+           let authorityDirectoryLastRefresh,
+           now.timeIntervalSince(authorityDirectoryLastRefresh) < 3600 {
+            return
+        }
+
+        guard let baseURL = authorityBaseURL else {
+            availableAuthorities = []
+            authorityDirectoryLastRefresh = nil
+            return
+        }
+
+        isRefreshingAuthorities = true
+        defer { isRefreshingAuthorities = false }
+
+        do {
+            let listURL = baseURL.appendingPathComponent("authorities")
+            let (data, response) = try await URLSession.shared.data(from: listURL)
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+                throw CalendarProviderError.invalidResponse
+            }
+
+            let decoded = try JSONDecoder().decode(AuthorityDirectoryResponse.self, from: data)
+            let authorities = decoded.authorities
+                .filter { $0.isActive ?? true }
+                .sorted { lhs, rhs in lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending }
+
+            availableAuthorities = authorities
+            authorityDirectoryLastRefresh = now
+
+            if selectedAuthoritySlug.isEmpty, let firstSlug = authorities.first?.slug {
+                selectedAuthoritySlug = firstSlug
+            }
+        } catch {
+            availableAuthorities = []
+            authorityDirectoryLastRefresh = nil
+            if authorityEnabled {
+                authorityError = "Authority directory is unavailable right now."
             }
         }
     }
@@ -296,6 +385,54 @@ final class AppState: ObservableObject {
         }
         return "Calendar updated for \(labels.joined(separator: ", "))."
     }
+
+    private static func migratedAuthorityConfig(baseURL: String, slug: String) -> (baseURL: String, slug: String) {
+        let trimmedBaseURL = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedSlug = slug.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedBaseURL.isEmpty && !trimmedSlug.isEmpty {
+            return (trimmedBaseURL, trimmedSlug)
+        }
+
+        guard
+            let legacyFeedURL = UserDefaults.standard.string(forKey: legacyAuthorityFeedURLKey),
+            let legacyURL = URL(string: legacyFeedURL)
+        else {
+            return (trimmedBaseURL, trimmedSlug)
+        }
+
+        let pathParts = legacyURL.pathComponents
+        guard
+            let authorityIndex = pathParts.firstIndex(of: "authority"),
+            pathParts.count > authorityIndex + 1
+        else {
+            return (trimmedBaseURL, trimmedSlug)
+        }
+
+        let migratedSlug = String(pathParts[authorityIndex + 1])
+        var components = URLComponents()
+        components.scheme = legacyURL.scheme
+        components.host = legacyURL.host
+        components.port = legacyURL.port
+        let migratedBaseURL = components.string ?? ""
+
+        let resolvedBaseURL = trimmedBaseURL.isEmpty ? migratedBaseURL : trimmedBaseURL
+        let resolvedSlug = trimmedSlug.isEmpty ? migratedSlug : trimmedSlug
+        return (resolvedBaseURL, resolvedSlug)
+    }
+}
+
+private struct AuthorityDirectoryResponse: Decodable {
+    let authorities: [AuthorityDirectoryEntry]
+}
+
+struct AuthorityDirectoryEntry: Decodable, Hashable, Identifiable {
+    let slug: String
+    let name: String
+    let regionCode: String
+    let methodology: String
+    let isActive: Bool?
+
+    var id: String { slug }
 }
 
 private struct MonthStartOverride {

@@ -43,10 +43,40 @@ struct SettingsView: View {
             }
 
             Section("Authority") {
-                Toggle("Follow authority updates (CHC)", isOn: $appState.authorityEnabled)
-                TextField("Authority feed URL", text: $appState.authorityFeedURLString)
+                Toggle("Follow authority updates", isOn: $appState.authorityEnabled)
+                TextField("Authority platform URL", text: $appState.authorityBaseURLString)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
+
+                Button("Refresh authorities") {
+                    Task {
+                        await appState.refreshAuthorityDirectory(force: true)
+                        await appState.refreshCalendarData(force: true)
+                    }
+                }
+                .disabled(appState.isRefreshingAuthorities || appState.isRefreshingCalendar)
+
+                if appState.isRefreshingAuthorities {
+                    HStack(spacing: 12) {
+                        ProgressView()
+                        Text("Loading authorities...")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Picker("Selected authority", selection: $appState.selectedAuthoritySlug) {
+                    Text("None").tag("")
+                    ForEach(appState.availableAuthorities) { authority in
+                        Text("\(authority.name) (\(authority.slug))")
+                            .tag(authority.slug)
+                    }
+                }
+
+                if let feedURL = appState.authorityFeedURL {
+                    Text("Feed: \(feedURL.absoluteString)")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
 
                 Text("Manual overrides always take precedence over authority updates.")
                     .font(.footnote)
@@ -73,6 +103,9 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+        .task {
+            await appState.refreshAuthorityDirectory()
+        }
     }
 
     private var lastRefreshText: String {
