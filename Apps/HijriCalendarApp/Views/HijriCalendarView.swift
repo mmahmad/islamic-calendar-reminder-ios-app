@@ -24,6 +24,14 @@ struct HijriCalendarView: View {
             }
         }
         .navigationTitle("Calendar")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Today") {
+                    jumpToToday()
+                }
+                .disabled(todayMonthIndex == nil || todayMonthIndex == selectedIndex)
+            }
+        }
         .background(Color(.systemGroupedBackground))
         .task {
             if appState.calendarDefinitions.isEmpty {
@@ -204,6 +212,15 @@ struct HijriCalendarView: View {
         return sortedDefinitions[selectedIndex]
     }
 
+    private var todayMonthIndex: Int? {
+        let today = calendar.startOfDay(for: Date())
+        return sortedDefinitions.firstIndex { definition in
+            let start = calendar.startOfDay(for: definition.gregorianStartDate)
+            guard let end = definition.gregorianEndDate(calendar: calendar) else { return false }
+            return today >= start && today <= end
+        }
+    }
+
     private var todayHijriLabel: String? {
         guard let engine = appState.calendarEngine,
               let hijriDate = engine.hijriDate(for: Date()) else {
@@ -345,6 +362,11 @@ struct HijriCalendarView: View {
         selectedIndex = index
         let definition = sortedDefinitions[index]
         selectedMonthKey = HijriMonthKey(year: definition.hijriYear, month: definition.hijriMonth)
+    }
+
+    private func jumpToToday() {
+        guard let index = todayMonthIndex else { return }
+        applySelection(index: index)
     }
 
     private func presentDayDetails(for cell: HijriCalendarCell, in definition: HijriMonthDefinition) {
