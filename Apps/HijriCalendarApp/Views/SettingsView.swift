@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var appState: AppState
+    @State private var isShowingUpdatedMonths = false
 
     var body: some View {
         Form {
@@ -31,9 +32,18 @@ struct SettingsView: View {
                 .disabled(appState.isRefreshingCalendar)
 
                 if let message = appState.calendarUpdateMessage {
-                    Text(message)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(message)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+
+                        if !appState.calendarUpdatedMonths.isEmpty {
+                            Button("View updated months (\(appState.calendarUpdatedMonths.count))") {
+                                isShowingUpdatedMonths = true
+                            }
+                            .font(.footnote)
+                        }
+                    }
                 }
                 if let error = appState.calendarError {
                     Text(error)
@@ -105,6 +115,23 @@ struct SettingsView: View {
         .navigationTitle("Settings")
         .task {
             await appState.refreshAuthorityDirectory()
+        }
+        .sheet(isPresented: $isShowingUpdatedMonths) {
+            NavigationStack {
+                List {
+                    ForEach(Array(appState.calendarUpdatedMonths.enumerated()), id: \.offset) { _, monthLabel in
+                        Text(monthLabel)
+                    }
+                }
+                .navigationTitle("Updated Months")
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Done") {
+                            isShowingUpdatedMonths = false
+                        }
+                    }
+                }
+            }
         }
     }
 

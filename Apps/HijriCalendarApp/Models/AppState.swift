@@ -62,6 +62,7 @@ final class AppState: ObservableObject {
     @Published var authorityError: String?
     @Published var calendarError: String?
     @Published var calendarUpdateMessage: String?
+    @Published var calendarUpdatedMonths: [String] = []
     @Published var isRefreshingCalendar = false
     @Published var isRefreshingAuthorities = false
 
@@ -177,7 +178,14 @@ final class AppState: ObservableObject {
             lastRefresh = now
 
             let updatedMonths = detectUpdatedMonths(old: previous, new: calendarDefinitions)
-            calendarUpdateMessage = updatedMonths.isEmpty ? nil : updatedMonthsMessage(for: updatedMonths)
+            if updatedMonths.isEmpty {
+                calendarUpdateMessage = nil
+                calendarUpdatedMonths = []
+            } else {
+                let notice = updatedMonthsNotice(for: updatedMonths)
+                calendarUpdateMessage = notice.summary
+                calendarUpdatedMonths = notice.months
+            }
         } catch {
             if let providerError = error as? CalendarProviderError,
                let description = providerError.errorDescription {
@@ -378,12 +386,15 @@ final class AppState: ObservableObject {
         }
     }
 
-    private func updatedMonthsMessage(for months: [HijriMonthDefinition]) -> String {
+    private func updatedMonthsNotice(for months: [HijriMonthDefinition]) -> (summary: String, months: [String]) {
         let labels = months.map { "\(HijriDateDisplay.monthName(for: $0.hijriMonth)) \($0.hijriYear)" }
         if labels.count == 1, let first = labels.first {
-            return "Calendar updated for \(first)."
+            return ("Calendar updated for \(first).", labels)
         }
-        return "Calendar updated for \(labels.joined(separator: ", "))."
+        if labels.count <= 3 {
+            return ("Calendar updated for \(labels.joined(separator: ", ")).", labels)
+        }
+        return ("Calendar updated for \(labels.count) months.", labels)
     }
 
     private static func migratedAuthorityConfig(baseURL: String, slug: String) -> (baseURL: String, slug: String) {
