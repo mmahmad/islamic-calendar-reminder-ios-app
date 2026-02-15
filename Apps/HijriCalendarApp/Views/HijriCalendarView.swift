@@ -31,6 +31,19 @@ struct HijriCalendarView: View {
                 }
                 .disabled(todayMonthIndex == nil || todayMonthIndex == selectedIndex)
             }
+            if appState.authorityEnabled {
+                ToolbarItem(placement: .topBarTrailing) {
+                    if appState.isRefreshingCalendar {
+                        ProgressView()
+                    } else {
+                        Button("Sync") {
+                            Task {
+                                await appState.refreshCalendarData(force: true)
+                            }
+                        }
+                    }
+                }
+            }
         }
         .background(Color(.systemGroupedBackground))
         .task {
@@ -118,6 +131,9 @@ struct HijriCalendarView: View {
             }
             .padding(.horizontal)
             .padding(.bottom, 24)
+        }
+        .refreshable {
+            await appState.refreshCalendarData(force: true)
         }
     }
 
