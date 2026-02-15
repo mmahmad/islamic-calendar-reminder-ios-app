@@ -124,6 +124,16 @@ final class AppState: ObservableObject {
         return selectedAuthoritySlug
     }
 
+    private func isCancellation(_ error: Error) -> Bool {
+        if error is CancellationError {
+            return true
+        }
+        if let urlError = error as? URLError, urlError.code == .cancelled {
+            return true
+        }
+        return false
+    }
+
     func refreshCalendarData(force: Bool = false) async {
         let now = Date()
         if !force, let lastRefresh, now.timeIntervalSince(lastRefresh) < 3600 {
@@ -155,6 +165,9 @@ final class AppState: ObservableObject {
                             overrideSource: .authority
                         )
                     } catch {
+                        if isCancellation(error) {
+                            return
+                        }
                         authorityError = "Authority feed is unavailable right now."
                     }
                 } else if authorityBaseURL == nil {
@@ -187,6 +200,9 @@ final class AppState: ObservableObject {
                 calendarUpdatedMonths = notice.months
             }
         } catch {
+            if isCancellation(error) {
+                return
+            }
             if let providerError = error as? CalendarProviderError,
                let description = providerError.errorDescription {
                 calendarError = "Unable to load the calculated calendar. \(description)"
@@ -232,6 +248,9 @@ final class AppState: ObservableObject {
                 selectedAuthoritySlug = firstSlug
             }
         } catch {
+            if isCancellation(error) {
+                return
+            }
             availableAuthorities = []
             authorityDirectoryLastRefresh = nil
             if authorityEnabled {
